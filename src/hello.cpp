@@ -1,13 +1,19 @@
+#include "hello.hpp"
 #include <cstdio>
 #include <optional>
+#include <vector>
+#include <algorithm>
+#include <ranges>
 
 #include <SDL.h>
 #include <emscripten.h>
 
+
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 
-void main_loop() {
+void main_loop() 
+{
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
@@ -45,9 +51,10 @@ void main_loop() {
     SDL_RenderPresent(renderer);    
 }
 
-int main(int argc, char* argv[]) {
+int app_main(int argc, char* argv[]) 
+{
     
-    std::printf("Hello, World of Wasm!\n");    
+    std::printf("Hello, World of Wasm with C++ !\n");    
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -64,6 +71,74 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
+
+class Object 
+{
+
+public:
+    //object api
+    virtual void doSomething() 
+    {
+        //implementation
+        std::printf("Doing object something!\n");
+    }
+
+protected:
+
+    Object() = default;
+    Object(const Object&) = default;
+    Object & operator=(const Object&) = default;
+
+    Object(Object&&) = default;
+    Object & operator=(Object&&) = default;
+
+    virtual ~Object() = default;
+};
+
+
+class Derived : public Object
+{   
+    using Object::Object; //inherit constructors
+
+public:
+    void doSomething() override
+    {
+        //call base class implementation
+        Object::doSomething();
+        //additional implementation
+        std::printf("Doing derived something! %s\n", "nice");
+    }
+};
+
+
+namespace stdv = std::views;
+
+int main(int argc, char* argv[]) 
+{
+    int status = 0;
+    Derived obj;
+    obj.doSomething();
+
+    std::vector <int> numbers = {1, 2, 3, 4, 5, 6};
+    auto it = std::ranges::find_if(numbers, [](int n) { return n % 2 == 0; });
+    auto it2 = std::find_if(numbers.cbegin(), numbers.cend(), [](int n) { return n % 2 == 0; });
+
+    auto dataView = numbers 
+                  | std::views::filter([](int n) { return n % 2 == 0; })
+                  | std::views::transform([](int n) { return n * n; })
+                  | std::views::take(2);
+
+    for (int n : dataView) 
+    {
+        std::printf("Number: %d\n", n);     
+    }
+
+    status = app_main(argc, argv);
+    
+    return status;
+}
+
 
 
 

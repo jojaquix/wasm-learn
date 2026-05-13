@@ -30,6 +30,10 @@ add_executable(hello
 # Warnings
 target_compile_options(hello PRIVATE -Wall -Wextra -fno-exceptions -fno-rtti)
 
+# Add include path for deps/tl
+target_include_directories(hello PRIVATE "${CMAKE_SOURCE_DIR}/deps/tl")
+
+
 # Output name and directory
 set_target_properties(hello PROPERTIES
   OUTPUT_NAME "hello"
